@@ -3,7 +3,8 @@
   "displayName": "Workspace Command Manager",
   "description": "Orchestrate, configure, and execute commands across multi-repository workspaces with dynamic prompts and per-project overrides.",
   "version": "1.0.0",
-  "publisher": "workspace-command-manager",
+  "license": "MIT",
+  "publisher": "charles-rajendran",
   "repository": {
     "type": "git",
     "url": "https://github.com/personal/vsc-workspace-manager.git"
@@ -13,8 +14,7 @@
     "vscode": "^1.85.0"
   },
   "categories": [
-    "Other",
-    "Productivity"
+    "Other"
   ],
   "keywords": [
     "workspace",
@@ -143,18 +143,28 @@
     "watch": "node esbuild.js --watch",
     "lint": "eslint src --ext ts",
     "lint:fix": "eslint src --ext ts --fix",
-    "test": "ts-node -r ./test/mock-vscode.js test/runner.test.ts"
+    "test": "ts-node -r ./test/mock-vscode.js test/runner.test.ts",
+    "package": "vsce package --no-dependencies --allow-missing-repository",
+    "release": "standard-version",
+    "release:patch": "standard-version --release-as patch",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
+    "release:first": "standard-version --first-release",
+    "release:dry-run": "standard-version --dry-run",
+    "publish:marketplace": "vsce publish --no-dependencies --allow-missing-repository"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
+    "@vscode/vsce": "^3.9.2",
     "esbuild": "^0.20.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^18.0.0",
     "eslint-plugin-import": "^2.29.1",
+    "standard-version": "^9.5.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }

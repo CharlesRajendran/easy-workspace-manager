@@ -71,7 +71,7 @@ export class DashboardPanel {
 
     const panel = vscode.window.createWebviewPanel(
       'workspaceManagerDashboard',
-      'Workspace Command Manager',
+      'Workspace Manager',
       column || vscode.ViewColumn.One,
       {
         enableScripts: true,
@@ -173,7 +173,7 @@ export class DashboardPanel {
         activeTab,
         settings: {
           reuseTerminals: config.get<boolean>('reuseTerminals', true),
-          terminalPrefix: config.get<string>('terminalPrefix', '[WCM]'),
+          terminalPrefix: config.get<string>('terminalPrefix', '[WM]'),
         },
       },
     };

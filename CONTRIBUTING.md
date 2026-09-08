@@ -1,6 +1,6 @@
-# Contributing to Workspace Command Manager
+# Contributing to Workspace Manager
 
-First off, thank you for considering contributing to **Workspace Command Manager**! 🎉
+First off, thank you for considering contributing to **Workspace Manager**! 🎉
 
 This document provides guidelines and instructions for contributing to this open source project.
 
@@ -51,8 +51,8 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 3. In the new window, open the sample multi-root workspace:
    **File > Open Workspace from File...** > select `test/fixtures/example-workspace/demo.code-workspace`.
 4. Open the Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`) and type:
-   `Workspace Command Manager: Open Workspace Command Manager Dashboard`
-5. Alternatively, click the **Workspace Command Manager** icon in the Activity Bar or status bar.
+   `Workspace Manager: Open Workspace Manager Dashboard`
+5. Alternatively, click the **Workspace Manager** icon in the Activity Bar or status bar.
 
 ### Watching for Changes
 
@@ -158,8 +158,11 @@ npm run release
 
 # Push release and tags to GitHub
 git push --follow-tags origin master
+
+# Publish to Visual Studio Marketplace directly via CLI:
+npm run publish:vsce
 ```
 
 ---
 
-Thank you for helping make **Workspace Command Manager** better for everyone!
+Thank you for helping make **Workspace Manager** better for everyone!

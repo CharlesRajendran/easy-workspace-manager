@@ -1,6 +1,6 @@
 {
-  "name": "vsc-workspace-command-manager",
-  "displayName": "Workspace Command Manager",
+  "name": "workspace-manager",
+  "displayName": "Workspace Manager",
   "description": "Orchestrate, configure, and execute commands across multi-repository workspaces with dynamic prompts and per-project overrides.",
   "version": "1.0.0",
   "license": "MIT",
@@ -35,7 +35,7 @@
       "activitybar": [
         {
           "id": "workspace-manager-container",
-          "title": "Workspace Command Manager",
+          "title": "Workspace Manager",
           "icon": "resources/activitybar-icon.svg"
         }
       ]
@@ -52,32 +52,32 @@
     "commands": [
       {
         "command": "workspaceManager.openDashboard",
-        "title": "Open Workspace Command Manager Dashboard",
-        "category": "Workspace Command Manager",
+        "title": "Open Workspace Manager Dashboard",
+        "category": "Workspace Manager",
         "icon": "$(layout-panel)"
       },
       {
         "command": "workspaceManager.newCommand",
         "title": "Create New Workspace Command",
-        "category": "Workspace Command Manager",
+        "category": "Workspace Manager",
         "icon": "$(add)"
       },
       {
         "command": "workspaceManager.runPreset",
         "title": "Run Workspace Command Preset",
-        "category": "Workspace Command Manager",
+        "category": "Workspace Manager",
         "icon": "$(play)"
       },
       {
         "command": "workspaceManager.refreshFolders",
         "title": "Refresh Workspace Projects",
-        "category": "Workspace Command Manager",
+        "category": "Workspace Manager",
         "icon": "$(refresh)"
       },
       {
         "command": "workspaceManager.stopAllTerminals",
         "title": "Close All Managed Terminals",
-        "category": "Workspace Command Manager",
+        "category": "Workspace Manager",
         "icon": "$(trash)"
       }
     ],
@@ -113,7 +113,7 @@
       ]
     },
     "configuration": {
-      "title": "Workspace Command Manager",
+      "title": "Workspace Manager",
       "properties": {
         "workspaceManager.reuseTerminals": {
           "type": "boolean",
@@ -122,8 +122,8 @@
         },
         "workspaceManager.terminalPrefix": {
           "type": "string",
-          "default": "[WCM]",
-          "description": "Prefix used for managed terminal names (e.g. [WCM] frontend)."
+          "default": "[WM]",
+          "description": "Prefix used for managed terminal names (e.g. [WM] frontend)."
         },
         "workspaceManager.saveFileLocation": {
           "type": "string",
@@ -145,13 +145,14 @@
     "lint:fix": "eslint src --ext ts --fix",
     "test": "ts-node -r ./test/mock-vscode.js test/runner.test.ts",
     "package": "vsce package --no-dependencies --allow-missing-repository",
+    "publish:vsce": "vsce publish --no-dependencies --allow-missing-repository",
+    "publish:package": "vsce publish --packagePath *.vsix",
     "release": "standard-version",
     "release:patch": "standard-version --release-as patch",
     "release:minor": "standard-version --release-as minor",
     "release:major": "standard-version --release-as major",
     "release:first": "standard-version --first-release",
-    "release:dry-run": "standard-version --dry-run",
-    "publish:marketplace": "vsce publish --no-dependencies --allow-missing-repository"
+    "release:dry-run": "standard-version --dry-run"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

@@ -7,7 +7,7 @@
   "publisher": "charles-rajendran",
   "repository": {
     "type": "git",
-    "url": "https://github.com/personal/vsc-workspace-manager.git"
+    "url": "https://github.com/CharlesRajendran/vsc-workspace-manager.git"
   },
   "icon": "resources/icon.png",
   "engines": {

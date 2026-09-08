@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workspace Command Manager Preview</title>
+  <link rel="stylesheet" href="../media/dashboard.css">
+  <style>
+    /* Standalone preview adjustments */
+    :root {
+      --vscode-editor-background: #1e1e1e;
+      --vscode-foreground: #cccccc;
+      --vscode-input-background: #282c34;
+      --vscode-input-foreground: #ffffff;
+      --vscode-input-border: rgba(255, 255, 255, 0.12);
+      --vscode-focusBorder: #007acc;
+      --vscode-descriptionForeground: #9da5b4;
+      --vscode-button-background: #007acc;
+      --vscode-button-foreground: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-branding">
+        <div class="brand-logo-container">
+          <img src="../resources/icon.png" alt="Workspace Command Manager Logo" class="brand-logo" />
+        </div>
+        <div class="brand-titles">
+          <div class="brand-title-row">
+            <h1>Workspace Command Manager</h1>
+            <span class="version-tag">v1.0</span>
+          </div>
+          <div class="workspace-badge-container">
+            <span class="status-dot"></span>
+            <span class="workspace-badge" id="workspace-badge">3 Projects Active</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-refresh" class="btn btn-secondary btn-sm" title="Refresh Projects">
+          <svg class="icon" viewBox="0 0 16 16" width="14" height="14">
+            <path d="M13.65 2.35A7.958 7.958 0 0 0 8 0a8 8 0 1 0 8 8h-2a6 6 0 1 1-1.76-4.24l-2.53 2.53H16V0l-2.35 2.35z" fill="currentColor"/>
+          </svg>
+          <span>Refresh</span>
+        </button>
+        <button id="btn-stop-terminals" class="btn btn-danger-subtle btn-sm" title="Close all [WCM] terminals">
+          <svg class="icon" viewBox="0 0 16 16" width="14" height="14">
+            <path d="M8 0a8 8 0 1 0 8 8 8 8 0 0 0-8-8zm3.5 10.5l-1 1L8 9l-2.5 2.5-1-1L7 8 4.5 5.5l1-1L8 7l2.5-2.5 1 1L9 8z" fill="currentColor"/>
+          </svg>
+          <span>Close Terminals</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Mode Switcher -->
+    <nav class="mode-tabs">
+      <button id="tab-runner-btn" class="tab-btn active">
+        <svg class="tab-svg" viewBox="0 0 16 16" width="14" height="14">
+          <path d="M6 1v3H1v11h14V4h-5V1H6zm1 1h2v2H7V2zm-5 3h12v9H2V5zm2 2v5l5-2.5L4 7z" fill="currentColor"/>
+        </svg>
+        <span>Run Saved Command</span>
+      </button>
+      <button id="tab-builder-btn" class="tab-btn">
+        <svg class="tab-svg" viewBox="0 0 16 16" width="14" height="14">
+          <path d="M14 7H9V2H7v5H2v2h5v5h2V9h5V7z" fill="currentColor"/>
+        </svg>
+        <span>Create New Command</span>
+      </button>
+    </nav>
+
+    <!-- TAB 1: PRESET RUNNER -->
+    <main id="tab-runner" class="tab-content active">
+      <!-- Searchable Combobox Section -->
+      <section class="card runner-card">
+        <div class="section-header">
+          <div class="title-with-icon">
+            <svg class="section-icon" viewBox="0 0 16 16" width="14" height="14"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 13.5v-11zm3.854 4.146a.5.5 0 0 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L7 7.793 4.854 6.646zM8 10.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1H8z" fill="currentColor"/></svg>
+            <label class="section-title">Select or Search Command</label>
+          </div>
+          <button id="btn-switch-to-builder" class="btn-link">+ Create New Command</button>
+        </div>
+
+        <div class="combobox-wrapper" id="combobox-wrapper">
+          <div class="combobox-input-container">
+            <span class="combobox-search-icon">
+              <svg viewBox="0 0 16 16" width="13" height="13"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" fill="currentColor"/></svg>
+            </span>
+            <input type="text" id="combobox-input" class="combobox-input" value="Git: Bulk Commit & Push" autocomplete="off" />
+            <button type="button" id="combobox-clear" class="combobox-clear-btn" style="display:block;">&times;</button>
+            <button type="button" id="combobox-toggle" class="combobox-arrow-btn">
+              <svg viewBox="0 0 16 16" width="12" height="12"><path d="M4 6l4 4 4-4z" fill="currentColor"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dynamic Prompts / Options Section -->
+      <section class="card prompts-card" id="prompts-card">
+        <div class="section-header">
+          <div class="title-with-icon">
+            <svg class="section-icon" viewBox="0 0 16 16" width="14" height="14"><path d="M3 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H3zm1 3h8v2H4V5zm0 4h5v2H4V9z" fill="currentColor"/></svg>
+            <label class="section-title">Command Parameters & Prompts</label>
+          </div>
+          <span class="section-subtitle">Values automatically formatted into shell command</span>
+        </div>
+        <div id="prompts-container" class="prompts-grid">
+          <div class="prompt-field">
+            <label>
+              <span>Enter commit message...</span>
+              <span class="flag-badge">-m</span>
+              <span class="required">*</span>
+            </label>
+            <input type="text" class="form-input" value="feat: add workspace command manager orchestrator" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Target Repositories Section -->
+      <section class="card targets-card">
+        <div class="section-header">
+          <div class="title-with-badge">
+            <svg class="section-icon" viewBox="0 0 16 16" width="14" height="14"><path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h3.879a1.5 1.5 0 0 1 1.06.44l1.122 1.12A.5.5 0 0 0 8.914 4H13.5A1.5 1.5 0 0 1 15 5.5v7a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 12.5v-9z" fill="currentColor"/></svg>
+            <label class="section-title">Target Repositories</label>
+            <span class="badge" id="selected-count-badge">3 / 3 Selected</span>
+          </div>
+          <div class="target-quick-toggles">
+            <button id="btn-select-all" class="btn btn-ghost btn-xs">Select All</button>
+            <button id="btn-deselect-all" class="btn btn-ghost btn-xs">Deselect All</button>
+          </div>
+        </div>
+
+        <div id="repo-list" class="repo-list">
+          <div class="repo-card">
+            <div class="repo-card-left">
+              <input type="checkbox" class="repo-checkbox" checked />
+              <div class="repo-details">
+                <div class="repo-title-row">
+                  <span class="repo-name">web-frontend</span>
+                  <span class="branch-badge"> main</span>
+                </div>
+                <div class="scripts-row">
+                  <span class="script-chip">start</span>
+                  <span class="script-chip">build</span>
+                  <span class="script-chip">test</span>
+                </div>
+              </div>
+            </div>
+            <div class="repo-card-right">
+              <button class="btn btn-icon btn-xs" title="Open terminal">
+                <svg class="icon" viewBox="0 0 16 16" width="14" height="14"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 13.5v-11zm3.854 4.146a.5.5 0 0 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L7 7.793 4.854 6.646zM8 10.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1H8z" fill="currentColor"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="repo-card">
+            <div class="repo-card-left">
+              <input type="checkbox" class="repo-checkbox" checked />
+              <div class="repo-details">
+                <div class="repo-title-row">
+                  <span class="repo-name">api-backend</span>
+                  <span class="branch-badge"> develop</span>
+                </div>
+                <div class="scripts-row">
+                  <span class="script-chip">start</span>
+                  <span class="script-chip">dev</span>
+                  <span class="script-chip">test</span>
+                </div>
+              </div>
+            </div>
+            <div class="repo-card-right">
+              <button class="btn btn-icon btn-xs" title="Open terminal">
+                <svg class="icon" viewBox="0 0 16 16" width="14" height="14"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 13.5v-11zm3.854 4.146a.5.5 0 0 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L7 7.793 4.854 6.646zM8 10.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1H8z" fill="currentColor"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="repo-card">
+            <div class="repo-card-left">
+              <input type="checkbox" class="repo-checkbox" checked />
+              <div class="repo-details">
+                <div class="repo-title-row">
+                  <span class="repo-name">docs-site</span>
+                  <span class="branch-badge"> feature/docs-v2</span>
+                </div>
+                <div class="repo-override-badge">Override: ng serve</div>
+                <div class="scripts-row">
+                  <span class="script-chip">serve</span>
+                  <span class="script-chip">build</span>
+                </div>
+              </div>
+            </div>
+            <div class="repo-card-right">
+              <button class="btn btn-icon btn-xs" title="Open terminal">
+                <svg class="icon" viewBox="0 0 16 16" width="14" height="14"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 13.5v-11zm3.854 4.146a.5.5 0 0 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L7 7.793 4.854 6.646zM8 10.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1H8z" fill="currentColor"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Assembled Command Live Preview -->
+      <section class="card preview-card">
+        <div class="section-header">
+          <div class="title-with-icon">
+            <svg class="section-icon" viewBox="0 0 16 16" width="14" height="14"><path d="M2 3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3zm2 2v2l2-1-2-1zm4 3h4v1H8V8z" fill="currentColor"/></svg>
+            <label class="section-title">Assembled Execution Preview</label>
+          </div>
+          <span class="preview-mode-tag" id="preview-mode-tag">Parallel Execution</span>
+        </div>
+        <div class="code-preview-container">
+          <div class="code-preview-header">
+            <span class="preview-dot red"></span>
+            <span class="preview-dot yellow"></span>
+            <span class="preview-dot green"></span>
+            <span class="preview-title">Terminal Command Dispatch</span>
+          </div>
+          <pre class="code-preview"><code><span style="color:#858585;"># In web-frontend (/workspace/services/web-frontend)</span>
+$ git commit -m "feat: add workspace command manager orchestrator"
+
+# In api-backend (/workspace/services/api-backend)
+$ git commit -m "feat: add workspace command manager orchestrator"
+
+<span style="color:#858585;"># In docs-site (/workspace/services/docs-site) [Override]</span>
+$ ng serve</code></pre>
+        </div>
+      </section>
+
+      <!-- Execution Sticky Action Bar -->
+      <div class="action-footer">
+        <div class="mode-selector">
+          <label for="runner-mode-select">Execution Mode:</label>
+          <select id="runner-mode-select" class="select-sm">
+            <option value="parallel">Parallel (Simultaneous terminals)</option>
+            <option value="sequential">Sequential (Staggered)</option>
+          </select>
+        </div>
+        <button id="btn-run-command" class="btn btn-primary btn-lg">
+          <svg class="icon" viewBox="0 0 16 16" width="14" height="14"><path d="M4 2l10 6-10 6z" fill="currentColor"/></svg>
+          <span id="btn-run-label">Run Across 3 Repositories</span>
+        </button>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

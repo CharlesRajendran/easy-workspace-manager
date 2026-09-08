@@ -1,0 +1,70 @@
+import { CommandPreset } from './types';
+
+export const DEFAULT_PRESETS: CommandPreset[] = [
+  {
+    id: 'dev-start-all',
+    name: 'Dev: Start All Services',
+    description: 'Launch development servers across all projects in parallel',
+    baseCommand: 'npm start',
+    options: [],
+    executionMode: 'parallel',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+  {
+    id: 'git-bulk-commit',
+    name: 'Git: Bulk Commit',
+    description: 'Commit changes with a custom message across all selected repositories',
+    baseCommand: 'git commit',
+    options: [
+      {
+        id: 'param-m',
+        flag: '-m',
+        placeholder: 'Enter commit message...',
+        defaultValue: '',
+        required: true,
+      },
+    ],
+    executionMode: 'parallel',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+  {
+    id: 'git-bulk-commit-push',
+    name: 'Git: Bulk Commit & Push',
+    description: 'Commit with message and push to remote across repositories',
+    baseCommand: 'git commit',
+    options: [
+      {
+        id: 'param-m',
+        flag: '-m',
+        placeholder: 'Enter commit message...',
+        defaultValue: '',
+        required: true,
+      },
+    ],
+    executionMode: 'sequential',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+  {
+    id: 'git-pull-latest',
+    name: 'Git: Pull Latest',
+    description: 'Pull latest commits from remote across all repositories',
+    baseCommand: 'git pull',
+    options: [],
+    executionMode: 'parallel',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+  {
+    id: 'build-all',
+    name: 'Build: Build All Projects',
+    description: 'Execute build script across all selected projects',
+    baseCommand: 'npm run build',
+    options: [],
+    executionMode: 'parallel',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+];

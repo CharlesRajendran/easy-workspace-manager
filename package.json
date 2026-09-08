@@ -1,0 +1,161 @@
+{
+  "name": "vsc-workspace-command-manager",
+  "displayName": "Workspace Command Manager",
+  "description": "Orchestrate, configure, and execute commands across multi-repository workspaces with dynamic prompts and per-project overrides.",
+  "version": "1.0.0",
+  "publisher": "workspace-command-manager",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/personal/vsc-workspace-manager.git"
+  },
+  "icon": "resources/icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Productivity"
+  ],
+  "keywords": [
+    "workspace",
+    "multi-root",
+    "terminal",
+    "commands",
+    "orchestrator",
+    "runner",
+    "git",
+    "monorepo"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "workspace-manager-container",
+          "title": "Workspace Command Manager",
+          "icon": "resources/activitybar-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "workspace-manager-container": [
+        {
+          "id": "workspace-manager.sidebarPresets",
+          "name": "Quick Presets",
+          "type": "tree"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "workspaceManager.openDashboard",
+        "title": "Open Workspace Command Manager Dashboard",
+        "category": "Workspace Command Manager",
+        "icon": "$(layout-panel)"
+      },
+      {
+        "command": "workspaceManager.newCommand",
+        "title": "Create New Workspace Command",
+        "category": "Workspace Command Manager",
+        "icon": "$(add)"
+      },
+      {
+        "command": "workspaceManager.runPreset",
+        "title": "Run Workspace Command Preset",
+        "category": "Workspace Command Manager",
+        "icon": "$(play)"
+      },
+      {
+        "command": "workspaceManager.refreshFolders",
+        "title": "Refresh Workspace Projects",
+        "category": "Workspace Command Manager",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "workspaceManager.stopAllTerminals",
+        "title": "Close All Managed Terminals",
+        "category": "Workspace Command Manager",
+        "icon": "$(trash)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "workspaceManager.openDashboard",
+          "when": "view == workspace-manager.sidebarPresets",
+          "group": "navigation@1"
+        },
+        {
+          "command": "workspaceManager.newCommand",
+          "when": "view == workspace-manager.sidebarPresets",
+          "group": "navigation@2"
+        },
+        {
+          "command": "workspaceManager.refreshFolders",
+          "when": "view == workspace-manager.sidebarPresets",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "workspaceManager.runPreset",
+          "when": "view == workspace-manager.sidebarPresets && viewItem == preset",
+          "group": "inline@1"
+        },
+        {
+          "command": "workspaceManager.openDashboard",
+          "when": "view == workspace-manager.sidebarPresets && viewItem == preset",
+          "group": "inline@2"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Workspace Command Manager",
+      "properties": {
+        "workspaceManager.reuseTerminals": {
+          "type": "boolean",
+          "default": true,
+          "description": "Reuse existing terminals for the same workspace folder instead of creating a new terminal every time."
+        },
+        "workspaceManager.terminalPrefix": {
+          "type": "string",
+          "default": "[WCM]",
+          "description": "Prefix used for managed terminal names (e.g. [WCM] frontend)."
+        },
+        "workspaceManager.saveFileLocation": {
+          "type": "string",
+          "enum": [
+            "workspaceFile",
+            "globalState"
+          ],
+          "default": "workspaceFile",
+          "description": "Where to persist presets: in .vscode/workspace-commands.json (committed to git) or in VS Code extension state."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "node esbuild.js --production",
+    "watch": "node esbuild.js --watch",
+    "lint": "eslint src --ext ts",
+    "lint:fix": "eslint src --ext ts --fix",
+    "test": "ts-node -r ./test/mock-vscode.js test/runner.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "esbuild": "^0.20.0",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^18.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

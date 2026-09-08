@@ -1,0 +1,9 @@
+{
+  "name": "api-backend",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "echo '[api-backend] Starting Express API server on port 5000...'",
+    "dev": "echo '[api-backend] Running in nodemon dev mode...'",
+    "test": "echo '[api-backend] Running integration test suite...'"
+  }
+}

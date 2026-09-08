@@ -1,0 +1,20 @@
+{
+  "folders": [
+    {
+      "name": "web-frontend",
+      "path": "services/web-frontend"
+    },
+    {
+      "name": "api-backend",
+      "path": "services/api-backend"
+    },
+    {
+      "name": "docs-site",
+      "path": "services/docs-site"
+    }
+  ],
+  "settings": {
+    "workspaceManager.reuseTerminals": true,
+    "workspaceManager.terminalPrefix": "[WCM]"
+  }
+}

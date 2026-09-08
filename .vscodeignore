@@ -1,0 +1,11 @@
+.vscode/**
+.vscode-test/**
+src/**
+test/**
+.eslintrc.js
+.eslintignore
+tsconfig.json
+esbuild.js
+**/*.map
+node_modules/**
+example-workspace/**

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+  <!-- VS Code Ribbon Geometry -->
+  <path d="M17.5 17.5L5.8 23L1.5 19.5L14 9.5L17.5 17.5Z" fill="currentColor" fill-opacity="0.75" />
+  <path d="M1.5 4.5L5.8 1L17.5 6.5L14 14.5L1.5 4.5Z" fill="currentColor" fill-opacity="0.75" />
+  <path d="M5.8 1L17.5 6.5V17.5L5.8 23L1.5 19.5V4.5L5.8 1Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" />
+  <!-- Folder Overlay in Upper Right -->
+  <g transform="translate(10, 0)">
+    <rect x="0" y="2" width="13" height="9" rx="1.5" fill="#1e1e1e" stroke="currentColor" stroke-width="1.3"/>
+    <path d="M0 3.5C0 2.67 0.67 2 1.5 2H4.5L6 3.8H11.5C12.33 3.8 13 4.47 13 5.3V10C13 10.83 12.33 11.5 11.5 11.5H1.5C0.67 11.5 0 10.83 0 10V3.5Z" fill="currentColor" />
+    <line x1="2" y1="6.5" x2="11" y2="6.5" stroke="#1e1e1e" stroke-width="1"/>
+  </g>
+</svg>

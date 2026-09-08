@@ -1,0 +1,9 @@
+{
+  "name": "web-frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "echo '[web-frontend] Starting React dev server on port 3000...'",
+    "build": "echo '[web-frontend] Building production assets...'",
+    "test": "echo '[web-frontend] Running unit tests...'"
+  }
+}

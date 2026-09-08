@@ -17,8 +17,8 @@ export function activate(context: vscode.ExtensionContext) {
   // Create Status Bar Item
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
   statusBarItem.command = 'workspaceManager.openDashboard';
-  statusBarItem.text = '$(folder-library) Workspace Manager';
-  statusBarItem.tooltip = 'Open Workspace Manager Multi-Project Dashboard';
+  statusBarItem.text = '$(folder-library) Easy Workspace Manager';
+  statusBarItem.tooltip = 'Open Easy Workspace Manager Multi-Project Dashboard';
   statusBarItem.show();
   context.subscriptions.push(statusBarItem);
 
@@ -49,7 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
       if (DashboardPanel.currentPanel) {
         await DashboardPanel.currentPanel.sendStateUpdate();
       }
-      vscode.window.showInformationMessage('Workspace Manager: Refreshed projects.');
+      vscode.window.showInformationMessage('Easy Workspace Manager: Refreshed projects.');
     }),
 
     vscode.commands.registerCommand('workspaceManager.stopAllTerminals', () => {

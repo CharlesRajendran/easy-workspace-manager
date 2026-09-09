@@ -407,6 +407,26 @@ body {
   border: 1px solid rgba(0, 122, 204, 0.4);
 }
 
+.variable-badge {
+  background: rgba(168, 85, 247, 0.2);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.45);
+}
+
+.placeholders-hint {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #c084fc;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.placeholders-hint .hint-label {
+  color: var(--text-muted);
+}
+
 /* Repositories List */
 .repo-list, .builder-repo-list {
   display: flex;

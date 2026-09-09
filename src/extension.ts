@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { PresetService } from './services/PresetService';
 import { TerminalRunner } from './services/TerminalRunner';
+import { CommandAssembler } from './services/CommandAssembler';
 import { DashboardPanel } from './views/DashboardPanel';
 import { SidebarPresetsProvider, PresetTreeItem } from './views/SidebarPresetsProvider';
 import { WorkspaceService } from './services/WorkspaceService';
@@ -83,8 +84,13 @@ export function activate(context: vscode.ExtensionContext) {
         preset = picked.preset;
       }
 
-      // If preset has options requiring input, open the dashboard so user can input them
-      if (preset.options && preset.options.length > 0) {
+      // If preset has options or embedded template placeholders requiring input, open the dashboard
+      const hasPlaceholders = CommandAssembler.extractPlaceholders(preset.baseCommand).length > 0
+        || Object.values(preset.repoOverrides || {}).some(
+          (cmd) => CommandAssembler.extractPlaceholders(cmd).length > 0,
+        );
+
+      if ((preset.options && preset.options.length > 0) || hasPlaceholders) {
         DashboardPanel.render(context.extensionUri, presetService, 'runner', preset.id);
         return;
       }

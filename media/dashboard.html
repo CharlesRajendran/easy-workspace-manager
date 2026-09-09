@@ -186,7 +186,8 @@
           <div class="form-group">
             <label for="builder-base-command">Base Shell Command <span class="required">*</span></label>
             <input type="text" id="builder-base-command" class="form-input font-mono" placeholder="e.g. npm start, git commit, pnpm run build" />
-            <small class="help-text">You can also use placeholder tags like <code>git commit -m "{message}"</code> or <code>docker build -t {tag} .</code></small>
+            <small class="help-text">You can also use placeholder tags like <code>git pull origin {branch}</code> or <code>docker build -t {tag} .</code></small>
+            <div id="builder-placeholders-hint" class="placeholders-hint" style="display: none;"></div>
           </div>
         </section>
 
@@ -198,7 +199,7 @@
                 <svg class="section-icon" viewBox="0 0 16 16" width="14" height="14"><path d="M2 2h12v2H2V2zm2 4h8v2H4V6zm-2 4h12v2H2v-2z" fill="currentColor"/></svg>
                 <label class="section-title">Custom Options & Dynamic Prompts</label>
               </div>
-              <span class="section-subtitle">Flags or arguments that prompt the user before execution</span>
+              <span class="section-subtitle">Flags or arguments that prompt the user before execution (embedded variables like <code>{branch}</code> are auto-detected)</span>
             </div>
             <button type="button" id="btn-add-option" class="btn btn-secondary btn-sm">
               + Add Option / Flag

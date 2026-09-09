@@ -53,6 +53,7 @@
   const builderName = document.getElementById('builder-name');
   const builderDesc = document.getElementById('builder-description');
   const builderBaseCmd = document.getElementById('builder-base-command');
+  const builderPlaceholdersHint = document.getElementById('builder-placeholders-hint');
   const btnAddOption = document.getElementById('btn-add-option');
   const optionsBuilderContainer = document.getElementById('options-builder-container');
   const builderRepoList = document.getElementById('builder-repo-list');
@@ -62,6 +63,57 @@
   const btnResetBuilder = document.getElementById('btn-reset-builder');
 
   const toast = document.getElementById('toast');
+
+  // Extract template placeholders like {branch} or {tag} using /[a-zA-Z0-9_:.-]+/
+  function extractPlaceholders(command) {
+    if (!command) return [];
+    const matches = command.match(/(?<!\$)\{([a-zA-Z0-9_:.-]+)\}/g);
+    if (!matches) return [];
+    return Array.from(new Set(matches.map((m) => m.slice(1, -1))));
+  }
+
+  function getPresetTemplateVars(preset) {
+    if (!preset) return [];
+    const vars = new Set(extractPlaceholders(preset.baseCommand || ''));
+    if (preset.repoOverrides) {
+      Object.values(preset.repoOverrides).forEach((cmd) => {
+        extractPlaceholders(cmd).forEach((v) => vars.add(v));
+      });
+    }
+    return Array.from(vars);
+  }
+
+  function formatVarLabel(varName) {
+    return varName
+      .replace(/[_-]+/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  function getVarPlaceholderExample(varName) {
+    const lower = varName.toLowerCase();
+    if (lower.includes('branch')) return 'e.g. main, develop, feature/...';
+    if (lower.includes('tag')) return 'e.g. v1.0.0, latest';
+    if (lower.includes('env')) return 'e.g. staging, production';
+    if (lower.includes('msg') || lower.includes('message')) return 'e.g. feat: add new feature';
+    if (lower.includes('version')) return 'e.g. 1.0.0';
+    if (lower.includes('port')) return 'e.g. 3000, 8080';
+    return `Enter value for {${varName}}...`;
+  }
+
+  function updateBuilderPlaceholdersHint() {
+    if (!builderPlaceholdersHint) return;
+    const placeholders = extractPlaceholders(builderBaseCmd ? builderBaseCmd.value : '');
+    if (placeholders.length === 0) {
+      builderPlaceholdersHint.style.display = 'none';
+      builderPlaceholdersHint.innerHTML = '';
+      return;
+    }
+    builderPlaceholdersHint.style.display = 'flex';
+    builderPlaceholdersHint.innerHTML = `
+      <span class="hint-label">Detected dynamic template variable${placeholders.length === 1 ? '' : 's'}:</span>
+      ${placeholders.map((p) => `<span class="flag-badge variable-badge font-mono">{${escapeHtml(p)}}</span>`).join(' ')}
+    `;
+  }
 
   // Toast Helper
   function showToast(message, isError = false) {
@@ -201,6 +253,20 @@
       });
     }
 
+    // Populate template variables defaults
+    const templateVars = getPresetTemplateVars(preset);
+    templateVars.forEach((varName) => {
+      if (userValues[varName] === undefined) {
+        if (varName.toLowerCase() === 'branch') {
+          const activeRepoWithBranch = repos.find((r) => r.gitBranch && repoSelection[r.id] !== false)
+            || repos.find((r) => r.gitBranch);
+          userValues[varName] = activeRepoWithBranch ? activeRepoWithBranch.gitBranch : 'main';
+        } else {
+          userValues[varName] = '';
+        }
+      }
+    });
+
     // Update execution mode
     if (preset.executionMode) {
       runnerModeSelect.value = preset.executionMode;
@@ -237,6 +303,7 @@
 
     renderBuilderOptions();
     renderBuilderRepoList();
+    updateBuilderPlaceholdersHint();
     switchTab('builder');
   }
 
@@ -302,9 +369,18 @@
     }
   });
 
-  // RENDER DYNAMIC PROMPTS
+  // RENDER DYNAMIC PROMPTS & TEMPLATE VARIABLES
   function renderPrompts() {
-    if (!selectedPreset || !selectedPreset.options || selectedPreset.options.length === 0) {
+    if (!selectedPreset) {
+      promptsCard.style.display = 'none';
+      promptsContainer.innerHTML = '';
+      return;
+    }
+
+    const templateVars = getPresetTemplateVars(selectedPreset);
+    const options = selectedPreset.options || [];
+
+    if (templateVars.length === 0 && options.length === 0) {
       promptsCard.style.display = 'none';
       promptsContainer.innerHTML = '';
       return;
@@ -313,7 +389,37 @@
     promptsCard.style.display = 'block';
     promptsContainer.innerHTML = '';
 
-    selectedPreset.options.forEach((opt) => {
+    // 1. Render Template Placeholders (e.g. {branch})
+    templateVars.forEach((varName) => {
+      const field = document.createElement('div');
+      field.className = 'prompt-field';
+
+      const label = document.createElement('label');
+      label.innerHTML = `
+        <span>${escapeHtml(formatVarLabel(varName))}</span>
+        <span class="flag-badge variable-badge font-mono">{${escapeHtml(varName)}}</span>
+        <span class="required">*</span>
+      `;
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'form-input prompt-template-input';
+      input.dataset.var = varName;
+      input.placeholder = getVarPlaceholderExample(varName);
+      input.value = userValues[varName] !== undefined ? userValues[varName] : '';
+
+      input.addEventListener('input', (e) => {
+        userValues[varName] = e.target.value;
+        updateLivePreview();
+      });
+
+      field.appendChild(label);
+      field.appendChild(input);
+      promptsContainer.appendChild(field);
+    });
+
+    // 2. Render Options / Flags (e.g. -m)
+    options.forEach((opt) => {
       const field = document.createElement('div');
       field.className = 'prompt-field';
 
@@ -326,9 +432,10 @@
 
       const input = document.createElement('input');
       input.type = 'text';
-      input.className = 'form-input';
+      input.className = 'form-input prompt-opt-input';
+      input.dataset.optId = opt.id;
       input.placeholder = opt.placeholder || 'Enter value...';
-      input.value = userValues[opt.id] || '';
+      input.value = userValues[opt.id] !== undefined ? userValues[opt.id] : (opt.defaultValue || '');
 
       input.addEventListener('input', (e) => {
         userValues[opt.id] = e.target.value;
@@ -444,14 +551,34 @@
   });
 
   // ASSEMBLED COMMAND LOGIC & LIVE PREVIEW
-  function assembleSingleCommand(baseCommand, options, values) {
+  function assembleSingleCommand(baseCommand, options, values, isLivePreview = false, repoContext = null) {
     let result = (baseCommand || '').trim();
 
     // Replace template tags {name}
-    Object.entries(values).forEach(([key, val]) => {
-      const reg = new RegExp(`\\{${key}\\}`, 'g');
-      result = result.replace(reg, val || '');
+    Object.entries(values || {}).forEach(([key, rawVal]) => {
+      const val = rawVal !== undefined && rawVal !== null ? String(rawVal) : '';
+      if (isLivePreview && !val.trim()) {
+        // Keep {key} in live preview if not provided yet so user sees placeholder
+        return;
+      }
+      const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const reg = new RegExp(`\\{${escapedKey}\\}`, 'g');
+      result = result.replace(reg, () => val);
     });
+
+    // Contextual fallback tokens if provided and not explicitly overridden in values
+    if (repoContext) {
+      if (repoContext.name && !values?.repo && !values?.repoName) {
+        result = result.replace(/\{repo\}/g, () => repoContext.name);
+        result = result.replace(/\{repoName\}/g, () => repoContext.name);
+      }
+      if (repoContext.path && !values?.repoPath) {
+        result = result.replace(/\{repoPath\}/g, () => repoContext.path);
+      }
+      if (repoContext.gitBranch && !values?.gitBranch && !values?.branch) {
+        result = result.replace(/\{gitBranch\}/g, () => repoContext.gitBranch);
+      }
+    }
 
     // Append defined options
     (options || []).forEach((opt) => {
@@ -488,11 +615,11 @@
     }
 
     const baseCmd = selectedPreset.baseCommand;
-    const assembledDefault = assembleSingleCommand(baseCmd, selectedPreset.options, userValues);
 
     const lines = selectedRepos.map((r) => {
       const override = selectedPreset.repoOverrides?.[r.id];
-      const finalCmd = override ? assembleSingleCommand(override, selectedPreset.options, userValues) : assembledDefault;
+      const cmdToAssemble = override || baseCmd;
+      const finalCmd = assembleSingleCommand(cmdToAssemble, selectedPreset.options, userValues, true, r);
       return `<span style="color:#858585;"># In ${escapeHtml(r.name)} (${escapeHtml(r.path)})</span>\n$ ${escapeHtml(finalCmd)}`;
     });
 
@@ -517,22 +644,36 @@
       return;
     }
 
+    // Check required template variables
+    const templateVars = getPresetTemplateVars(selectedPreset);
+    for (const varName of templateVars) {
+      if (!userValues[varName] || !userValues[varName].trim()) {
+        showToast(`Template variable "{${varName}}" is required.`, true);
+        const input = promptsContainer.querySelector(`[data-var="${varName}"]`);
+        if (input) input.focus();
+        return;
+      }
+    }
+
     // Check required options
     if (selectedPreset.options) {
       for (const opt of selectedPreset.options) {
         if (opt.required && !userValues[opt.id]?.trim()) {
           showToast(`Option "${opt.placeholder || opt.flag}" is required.`, true);
+          const input = promptsContainer.querySelector(`[data-opt-id="${opt.id}"]`);
+          if (input) input.focus();
           return;
         }
       }
     }
 
     const baseCmd = selectedPreset.baseCommand;
-    const assembledDefault = assembleSingleCommand(baseCmd, selectedPreset.options, userValues);
+    const assembledDefault = assembleSingleCommand(baseCmd, selectedPreset.options, userValues, false);
 
     const targets = selectedRepos.map((r) => {
       const override = selectedPreset.repoOverrides?.[r.id];
-      const finalCmd = override ? assembleSingleCommand(override, selectedPreset.options, userValues) : assembledDefault;
+      const cmdToAssemble = override || baseCmd;
+      const finalCmd = assembleSingleCommand(cmdToAssemble, selectedPreset.options, userValues, false, r);
       return {
         repoId: r.id,
         repoPath: r.path,
@@ -649,6 +790,8 @@
     });
   }
 
+  builderBaseCmd.addEventListener('input', updateBuilderPlaceholdersHint);
+
   btnResetBuilder.addEventListener('click', () => {
     builderName.value = '';
     builderDesc.value = '';
@@ -658,6 +801,7 @@
     builderTargets = {};
     renderBuilderOptions();
     renderBuilderRepoList();
+    updateBuilderPlaceholdersHint();
   });
 
   btnSavePreset.addEventListener('click', () => {
@@ -698,6 +842,12 @@
     const baseCmd = builderBaseCmd.value.trim();
     if (!baseCmd) {
       showToast('Please enter a Base Shell Command first.', true);
+      return;
+    }
+
+    const placeholders = extractPlaceholders(baseCmd);
+    if (placeholders.length > 0) {
+      showToast(`Command contains dynamic variable${placeholders.length === 1 ? '' : 's'} {${placeholders.join(', ')}}. Save as preset to enter values and run.`, true);
       return;
     }
 

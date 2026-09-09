@@ -63,6 +63,52 @@ describe('CommandAssembler & Command Assembly Tests', () => {
     const cmd = CommandAssembler.assembleCommand('npm test', options, userValues);
     assert.equal(cmd, 'npm test');
   });
+
+  it('should extract embedded template placeholders accurately', () => {
+    const vars1 = CommandAssembler.extractPlaceholders('git pull origin {branch}');
+    assert.deepEqual(vars1, ['branch']);
+
+    const vars2 = CommandAssembler.extractPlaceholders('docker build -t {image}:{tag} -f {dockerfile} .');
+    assert.deepEqual(vars2, ['image', 'tag', 'dockerfile']);
+
+    const vars3 = CommandAssembler.extractPlaceholders('run {service:port}');
+    assert.deepEqual(vars3, ['service:port']);
+
+    // Should ignore non-matching syntax like spaces or bash variables
+    const vars4 = CommandAssembler.extractPlaceholders("awk '{print $1}' && echo ${VAR} && echo {}");
+    assert.deepEqual(vars4, []);
+  });
+
+  it('should interpolate dynamic branch in git pull origin {branch}', () => {
+    const cmd = CommandAssembler.assembleCommand(
+      'git pull origin {branch}',
+      [],
+      { branch: 'develop' },
+    );
+    assert.equal(cmd, 'git pull origin develop');
+  });
+
+  it('should combine embedded template variables and option flags', () => {
+    const options: CommandOption[] = [
+      { id: 'rebase', flag: '--rebase', placeholder: 'Rebase' },
+    ];
+    const cmd = CommandAssembler.assembleCommand(
+      'git pull origin {branch}',
+      options,
+      { branch: 'feature/auth', rebase: 'true' },
+    );
+    assert.equal(cmd, 'git pull origin feature/auth --rebase true');
+  });
+
+  it('should fallback to repo context variables if not overridden', () => {
+    const cmd = CommandAssembler.assembleCommand(
+      'echo "Building {repoName} on {gitBranch}"',
+      [],
+      {},
+      { repoName: 'web-frontend', gitBranch: 'main' },
+    );
+    assert.equal(cmd, 'echo "Building web-frontend on main"');
+  });
 });
 
 describe('WorkspaceService & Project Discovery Tests', () => {
@@ -151,5 +197,9 @@ describe('Default Presets Tests', () => {
     assert.equal(commitPreset?.baseCommand, 'git commit');
     assert.equal(commitPreset?.options.length, 1);
     assert.equal(commitPreset?.options[0].flag, '-m');
+
+    const branchPreset = DEFAULT_PRESETS.find((p) => p.id === 'git-pull-branch');
+    assert.ok(branchPreset);
+    assert.equal(branchPreset?.baseCommand, 'git pull origin {branch}');
   });
 });

@@ -7,8 +7,9 @@ export class TerminalRunner {
     baseCommand: string,
     options: CommandOption[],
     userValues: Record<string, string>,
+    repoContext?: { repoName?: string; repoPath?: string; gitBranch?: string },
   ): string {
-    return CommandAssembler.assembleCommand(baseCommand, options, userValues);
+    return CommandAssembler.assembleCommand(baseCommand, options, userValues, repoContext);
   }
 
   public static async executeAcrossTargets(

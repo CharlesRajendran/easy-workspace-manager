@@ -58,6 +58,16 @@ export const DEFAULT_PRESETS: CommandPreset[] = [
     updatedAt: Date.now(),
   },
   {
+    id: 'git-pull-branch',
+    name: 'Git: Pull Specific Branch',
+    description: 'Pull commits from a specific branch across all repositories',
+    baseCommand: 'git pull origin {branch}',
+    options: [],
+    executionMode: 'parallel',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+  {
     id: 'build-all',
     name: 'Build: Build All Projects',
     description: 'Execute build script across all selected projects',

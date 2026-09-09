@@ -109,6 +109,79 @@ describe('CommandAssembler & Command Assembly Tests', () => {
     );
     assert.equal(cmd, 'echo "Building web-frontend on main"');
   });
+
+  it('should assemble standalone self option (e.g. --tags, -f) when enabled', () => {
+    const options: CommandOption[] = [
+      { id: 'tags', flag: '--tags', placeholder: 'Push all tags', isStandalone: true },
+      { id: 'force', flag: '-f', placeholder: 'Force push', isStandalone: true },
+    ];
+    const cmd1 = CommandAssembler.assembleCommand(
+      'git push origin main',
+      options,
+      { tags: 'true', force: false },
+    );
+    assert.equal(cmd1, 'git push origin main --tags');
+
+    const cmd2 = CommandAssembler.assembleCommand(
+      'git push origin main',
+      options,
+      { tags: true, force: 'true' },
+    );
+    assert.equal(cmd2, 'git push origin main --tags -f');
+
+    const cmd3 = CommandAssembler.assembleCommand(
+      'git push origin main',
+      options,
+      { tags: 'false', force: 'false' },
+    );
+    assert.equal(cmd3, 'git push origin main');
+  });
+
+  it('should mix standalone self options and key-value options cleanly', () => {
+    const options: CommandOption[] = [
+      { id: 'm', flag: '-m', placeholder: 'Message' },
+      { id: 'dryRun', flag: '--dry-run', placeholder: 'Dry Run', isStandalone: true },
+      { id: 'all', flag: '-a', placeholder: 'All', isSelfOption: true },
+    ];
+    const cmd = CommandAssembler.assembleCommand(
+      'git commit',
+      options,
+      { m: 'chore: test', dryRun: 'true', all: false },
+    );
+    assert.equal(cmd, 'git commit -m "chore: test" --dry-run');
+  });
+
+  it('should interpolate standalone self options in template tags', () => {
+    const options: CommandOption[] = [
+      { id: 'tags', flag: '--tags', placeholder: 'Push tags', isStandalone: true },
+    ];
+    const cmdActive = CommandAssembler.assembleCommand(
+      'git push origin {branch} {tags}',
+      options,
+      { branch: 'main', tags: 'true' },
+    );
+    assert.equal(cmdActive, 'git push origin main --tags');
+
+    const cmdInactive = CommandAssembler.assembleCommand(
+      'git push origin {branch} {tags}',
+      options,
+      { branch: 'main', tags: 'false' },
+    );
+    assert.equal(cmdInactive, 'git push origin main');
+  });
+
+  it('should respect defaultValue on standalone self options if user value omitted', () => {
+    const options: CommandOption[] = [
+      { id: 'verbose', flag: '-v', placeholder: 'Verbose', defaultValue: 'true', isStandalone: true },
+      { id: 'force', flag: '-f', placeholder: 'Force', defaultValue: 'false', isStandalone: true },
+    ];
+    const cmd = CommandAssembler.assembleCommand(
+      'npm run build',
+      options,
+      {},
+    );
+    assert.equal(cmd, 'npm run build -v');
+  });
 });
 
 describe('WorkspaceService & Project Discovery Tests', () => {

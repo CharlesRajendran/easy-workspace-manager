@@ -4,6 +4,8 @@ export interface CommandOption {
   placeholder: string;
   defaultValue?: string;
   required?: boolean;
+  isStandalone?: boolean;
+  isSelfOption?: boolean;
 }
 
 export interface CommandPreset {

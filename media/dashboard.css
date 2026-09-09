@@ -684,23 +684,126 @@ body {
 .option-builder-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   padding: 10px;
   background: rgba(0, 0, 0, 0.15);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
+  transition: border-color var(--transition-fast);
+}
+
+.option-builder-row:hover {
+  border-color: var(--border-focus);
 }
 
 .option-flag-input {
-  width: 90px;
+  width: 100px;
 }
 
 .option-label-input {
   flex: 1;
+  min-width: 160px;
 }
 
 .option-default-input {
-  width: 140px;
+  width: 130px;
+}
+
+.option-toggle-label {
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.option-toggle-label:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-focus);
+}
+
+.option-toggle-label.active {
+  background: rgba(234, 179, 8, 0.15);
+  border-color: rgba(234, 179, 8, 0.4);
+  color: #facc15;
+}
+
+.option-type-badge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--vscode-descriptionForeground);
+}
+
+.option-type-badge.self {
+  background: rgba(234, 179, 8, 0.2);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.4);
+}
+
+.prompt-field-checkbox {
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.prompt-field-checkbox:hover {
+  background: rgba(0, 0, 0, 0.22);
+  border-color: var(--border-focus);
+}
+
+.prompt-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  width: 100%;
+  margin: 0;
+}
+
+.prompt-checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--vscode-button-background, #007acc);
+}
+
+.prompt-checkbox-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.prompt-checkbox-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--vscode-foreground);
+}
+
+.self-option-tag {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(234, 179, 8, 0.15);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.35);
 }
 
 .empty-options {

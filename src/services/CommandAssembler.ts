@@ -15,14 +15,24 @@ export class CommandAssembler {
   public static assembleCommand(
     baseCommand: string,
     options: CommandOption[] = [],
-    userValues: Record<string, string> = {},
+    userValues: Record<string, unknown> = {},
     repoContext?: { repoName?: string; repoPath?: string; gitBranch?: string },
   ): string {
     let result = (baseCommand || '').trim();
 
+    const isSelfOption = (opt: CommandOption) => Boolean(opt.isStandalone || opt.isSelfOption);
+    const isValueTruthy = (val: unknown) => val === true || val === 'true' || val === '1' || val === 'yes' || val === 'on';
+
     // First, interpolate any template placeholders like {branch} or {message}
     for (const [key, rawVal] of Object.entries(userValues)) {
-      const val = rawVal !== undefined && rawVal !== null ? String(rawVal) : '';
+      const matchedOpt = options.find((o) => o.id === key);
+      let val = '';
+      if (matchedOpt && isSelfOption(matchedOpt)) {
+        val = isValueTruthy(rawVal) ? (matchedOpt.flag || '') : '';
+      } else {
+        val = rawVal !== undefined && rawVal !== null ? String(rawVal) : '';
+      }
+
       const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const placeholderRegex = new RegExp(`\\{${escapedKey}\\}`, 'g');
       if (placeholderRegex.test(result)) {
@@ -46,9 +56,25 @@ export class CommandAssembler {
 
     // Next, append any defined options that weren't placeholders in the baseCommand
     options.forEach((opt) => {
+      const isSelf = isSelfOption(opt);
       const rawVal = userValues[opt.id] ?? opt.defaultValue ?? '';
-      const val = rawVal.trim();
 
+      if (isSelf) {
+        if (!isValueTruthy(rawVal)) {
+          return;
+        }
+        const flagToAppend = (opt.flag || opt.placeholder || '').trim();
+        if (!flagToAppend) {
+          return;
+        }
+        const alreadyInBase = result.includes(`{${opt.id}}`) || result.includes(flagToAppend);
+        if (!alreadyInBase) {
+          result = `${result} ${flagToAppend}`;
+        }
+        return;
+      }
+
+      const val = String(rawVal).trim();
       const alreadyInBase = result.includes(`{${opt.id}}`)
         || (opt.flag && result.includes(opt.flag));
 
@@ -64,6 +90,6 @@ export class CommandAssembler {
       }
     });
 
-    return result.trim();
+    return result.replace(/\s+/g, ' ').trim();
   }
 }

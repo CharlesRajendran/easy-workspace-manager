@@ -249,7 +249,13 @@
     userValues = {};
     if (preset.options) {
       preset.options.forEach((opt) => {
-        userValues[opt.id] = opt.defaultValue || '';
+        const isSelf = Boolean(opt.isStandalone || opt.isSelfOption);
+        if (isSelf) {
+          const isDef = opt.defaultValue === 'true' || opt.defaultValue === true || opt.defaultValue === '1';
+          userValues[opt.id] = isDef ? 'true' : 'false';
+        } else {
+          userValues[opt.id] = opt.defaultValue || '';
+        }
       });
     }
 
@@ -418,32 +424,56 @@
       promptsContainer.appendChild(field);
     });
 
-    // 2. Render Options / Flags (e.g. -m)
+    // 2. Render Options / Flags (e.g. -m or --tags)
     options.forEach((opt) => {
+      const isSelf = Boolean(opt.isStandalone || opt.isSelfOption);
       const field = document.createElement('div');
-      field.className = 'prompt-field';
+      field.className = isSelf ? 'prompt-field prompt-field-checkbox' : 'prompt-field';
 
-      const label = document.createElement('label');
-      label.innerHTML = `
-        <span>${escapeHtml(opt.placeholder || 'Option Value')}</span>
-        ${opt.flag ? `<span class="flag-badge">${escapeHtml(opt.flag)}</span>` : ''}
-        ${opt.required ? '<span class="required">*</span>' : ''}
-      `;
+      if (isSelf) {
+        const isChecked = userValues[opt.id] === 'true' || userValues[opt.id] === true
+          || (userValues[opt.id] === undefined && (opt.defaultValue === 'true' || opt.defaultValue === true));
+        userValues[opt.id] = isChecked ? 'true' : 'false';
 
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.className = 'form-input prompt-opt-input';
-      input.dataset.optId = opt.id;
-      input.placeholder = opt.placeholder || 'Enter value...';
-      input.value = userValues[opt.id] !== undefined ? userValues[opt.id] : (opt.defaultValue || '');
+        field.innerHTML = `
+          <label class="prompt-checkbox-label" title="${escapeHtml(opt.placeholder || opt.flag || 'Toggle flag')}">
+            <input type="checkbox" class="prompt-opt-checkbox" data-opt-id="${escapeHtml(opt.id)}" ${isChecked ? 'checked' : ''} />
+            <div class="prompt-checkbox-content">
+              <span class="prompt-checkbox-title">${escapeHtml(opt.placeholder || opt.flag || 'Self Option')}</span>
+              ${opt.flag ? `<span class="flag-badge font-mono">${escapeHtml(opt.flag)}</span>` : ''}
+              <span class="self-option-tag">self-option</span>
+            </div>
+          </label>
+        `;
 
-      input.addEventListener('input', (e) => {
-        userValues[opt.id] = e.target.value;
-        updateLivePreview();
-      });
+        field.querySelector('.prompt-opt-checkbox').addEventListener('change', (e) => {
+          userValues[opt.id] = e.target.checked ? 'true' : 'false';
+          updateLivePreview();
+        });
+      } else {
+        const label = document.createElement('label');
+        label.innerHTML = `
+          <span>${escapeHtml(opt.placeholder || 'Option Value')}</span>
+          ${opt.flag ? `<span class="flag-badge">${escapeHtml(opt.flag)}</span>` : ''}
+          ${opt.required ? '<span class="required">*</span>' : ''}
+        `;
 
-      field.appendChild(label);
-      field.appendChild(input);
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'form-input prompt-opt-input';
+        input.dataset.optId = opt.id;
+        input.placeholder = opt.placeholder || 'Enter value...';
+        input.value = userValues[opt.id] !== undefined ? userValues[opt.id] : (opt.defaultValue || '');
+
+        input.addEventListener('input', (e) => {
+          userValues[opt.id] = e.target.value;
+          updateLivePreview();
+        });
+
+        field.appendChild(label);
+        field.appendChild(input);
+      }
+
       promptsContainer.appendChild(field);
     });
   }
@@ -554,8 +584,20 @@
   function assembleSingleCommand(baseCommand, options, values, isLivePreview = false, repoContext = null) {
     let result = (baseCommand || '').trim();
 
+    const isSelfOption = (opt) => Boolean(opt.isStandalone || opt.isSelfOption);
+    const isValueTruthy = (val) => val === true || val === 'true' || val === '1' || val === 'yes' || val === 'on';
+
     // Replace template tags {name}
     Object.entries(values || {}).forEach(([key, rawVal]) => {
+      const matchedOpt = (options || []).find((o) => o.id === key);
+      if (matchedOpt && isSelfOption(matchedOpt)) {
+        const flagVal = isValueTruthy(rawVal) ? (matchedOpt.flag || '') : '';
+        const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const reg = new RegExp(`\\{${escapedKey}\\}`, 'g');
+        result = result.replace(reg, () => flagVal);
+        return;
+      }
+
       const val = rawVal !== undefined && rawVal !== null ? String(rawVal) : '';
       if (isLivePreview && !val.trim()) {
         // Keep {key} in live preview if not provided yet so user sees placeholder
@@ -582,7 +624,25 @@
 
     // Append defined options
     (options || []).forEach((opt) => {
-      const val = (values[opt.id] || opt.defaultValue || '').trim();
+      const isSelf = isSelfOption(opt);
+      const rawVal = values ? values[opt.id] : undefined;
+      const effectiveVal = rawVal !== undefined ? rawVal : (opt.defaultValue || '');
+
+      if (isSelf) {
+        if (!isValueTruthy(effectiveVal)) return;
+
+        const flagToAppend = (opt.flag || opt.placeholder || '').trim();
+        if (!flagToAppend) return;
+
+        if (result.includes(`{${opt.id}}`) || result.includes(flagToAppend)) {
+          return;
+        }
+
+        result = `${result} ${flagToAppend}`;
+        return;
+      }
+
+      const val = (String(effectiveVal)).trim();
       if (!val) return;
 
       if (result.includes(`{${opt.id}}`) || (opt.flag && result.includes(opt.flag))) {
@@ -599,7 +659,7 @@
       }
     });
 
-    return result.trim();
+    return result.replace(/\s+/g, ' ').trim();
   }
 
   function updateLivePreview() {
@@ -658,7 +718,8 @@
     // Check required options
     if (selectedPreset.options) {
       for (const opt of selectedPreset.options) {
-        if (opt.required && !userValues[opt.id]?.trim()) {
+        const isSelf = Boolean(opt.isStandalone || opt.isSelfOption);
+        if (!isSelf && opt.required && !userValues[opt.id]?.trim()) {
           showToast(`Option "${opt.placeholder || opt.flag}" is required.`, true);
           const input = promptsContainer.querySelector(`[data-opt-id="${opt.id}"]`);
           if (input) input.focus();
@@ -706,16 +767,32 @@
     }
 
     builderOptions.forEach((opt, idx) => {
+      const isSelf = Boolean(opt.isStandalone || opt.isSelfOption);
+      const isDefaultOn = opt.defaultValue === 'true' || opt.defaultValue === true;
       const row = document.createElement('div');
       row.className = 'option-builder-row';
 
       row.innerHTML = `
-        <input type="text" class="form-input option-flag-input" placeholder="Flag (e.g. -m)" value="${escapeHtml(opt.flag || '')}" />
-        <input type="text" class="form-input option-label-input" placeholder="Placeholder (e.g. Enter message)" value="${escapeHtml(opt.placeholder || '')}" />
-        <input type="text" class="form-input option-default-input" placeholder="Default (optional)" value="${escapeHtml(opt.defaultValue || '')}" />
-        <label style="font-size: 11px; display:flex; align-items:center; gap:4px; cursor:pointer;">
-          <input type="checkbox" class="option-required-check" ${opt.required ? 'checked' : ''} /> Req
+        <input type="text" class="form-input option-flag-input font-mono" placeholder="Flag (${isSelf ? 'e.g. -f, --tags' : 'e.g. -m'})" value="${escapeHtml(opt.flag || '')}" title="Command flag syntax (e.g. -f, --tags, -m)" />
+        <input type="text" class="form-input option-label-input" placeholder="${isSelf ? 'Description (e.g. Force push / Include tags)' : 'Placeholder (e.g. Enter message)'}" value="${escapeHtml(opt.placeholder || '')}" title="Label or prompt placeholder" />
+        <label class="option-toggle-label ${isSelf ? 'active' : ''}" title="Toggle between Key-Value argument (expects value input) and Self Option (standalone flag like -f or --tags without value)">
+          <input type="checkbox" class="option-standalone-check" ${isSelf ? 'checked' : ''} />
+          <span class="option-type-badge ${isSelf ? 'self' : ''}">${isSelf ? 'Self Option' : 'Key-Value'}</span>
         </label>
+        ${
+          isSelf
+            ? `
+          <label class="option-toggle-label ${isDefaultOn ? 'active' : ''}" title="Whether this flag is enabled by default before execution" style="font-size: 11px;">
+            <input type="checkbox" class="option-default-bool-check" ${isDefaultOn ? 'checked' : ''} /> Default On
+          </label>
+        `
+            : `
+          <input type="text" class="form-input option-default-input" placeholder="Default (optional)" value="${escapeHtml(opt.defaultValue || '')}" title="Default value if not supplied by user" />
+          <label class="option-toggle-label" title="User must provide a value before execution" style="font-size: 11px;">
+            <input type="checkbox" class="option-required-check" ${opt.required ? 'checked' : ''} /> Req
+          </label>
+        `
+        }
         <button type="button" class="btn btn-icon btn-xs remove-option-btn" title="Remove Option">✕</button>
       `;
 
@@ -725,12 +802,42 @@
       row.querySelector('.option-label-input').addEventListener('input', (e) => {
         builderOptions[idx].placeholder = e.target.value;
       });
-      row.querySelector('.option-default-input').addEventListener('input', (e) => {
-        builderOptions[idx].defaultValue = e.target.value;
+
+      row.querySelector('.option-standalone-check').addEventListener('change', (e) => {
+        builderOptions[idx].isStandalone = e.target.checked;
+        builderOptions[idx].isSelfOption = e.target.checked;
+        if (e.target.checked) {
+          builderOptions[idx].required = false;
+          builderOptions[idx].defaultValue = builderOptions[idx].defaultValue === 'true' ? 'true' : 'false';
+        } else {
+          builderOptions[idx].defaultValue = '';
+        }
+        renderBuilderOptions();
       });
-      row.querySelector('.option-required-check').addEventListener('change', (e) => {
-        builderOptions[idx].required = e.target.checked;
-      });
+
+      if (isSelf) {
+        const defaultBoolCheck = row.querySelector('.option-default-bool-check');
+        if (defaultBoolCheck) {
+          defaultBoolCheck.addEventListener('change', (e) => {
+            builderOptions[idx].defaultValue = e.target.checked ? 'true' : 'false';
+            renderBuilderOptions();
+          });
+        }
+      } else {
+        const defaultInput = row.querySelector('.option-default-input');
+        if (defaultInput) {
+          defaultInput.addEventListener('input', (e) => {
+            builderOptions[idx].defaultValue = e.target.value;
+          });
+        }
+        const reqCheck = row.querySelector('.option-required-check');
+        if (reqCheck) {
+          reqCheck.addEventListener('change', (e) => {
+            builderOptions[idx].required = e.target.checked;
+          });
+        }
+      }
+
       row.querySelector('.remove-option-btn').addEventListener('click', () => {
         builderOptions.splice(idx, 1);
         renderBuilderOptions();
@@ -747,6 +854,8 @@
       placeholder: '',
       defaultValue: '',
       required: false,
+      isStandalone: false,
+      isSelfOption: false,
     });
     renderBuilderOptions();
   });

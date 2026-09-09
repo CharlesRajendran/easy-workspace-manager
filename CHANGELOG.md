@@ -2,6 +2,13 @@
 
 All notable changes to Easy Workspace Manager will be documented in this file.
 
+## [1.2.0](https://github.com/CharlesRajendran/vsc-workspace-manager/compare/v1.1.0...v1.2.0) (2026-09-09)
+
+
+### ✨ Features
+
+* add support for self-option (standalone) flags with checkbox UI and updated command assembly ([b0292f5](https://github.com/CharlesRajendran/vsc-workspace-manager/commit/b0292f53c0999d84dbe0a085faa5621dc8def130))
+
 ## 1.1.0 (2026-09-09)
 
 

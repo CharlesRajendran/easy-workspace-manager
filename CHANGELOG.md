@@ -2,6 +2,13 @@
 
 All notable changes to Workspace Terminal Manager will be documented in this file.
 
+## [1.3.0](https://github.com/CharlesRajendran/vsc-workspace-manager/compare/v1.2.0...v1.3.0) (2026-09-11)
+
+
+### ✨ Features
+
+* rename extension to Workspace Terminal Manager and add UI screenshots ([0d0d168](https://github.com/CharlesRajendran/vsc-workspace-manager/commit/0d0d1689b17284b907e9b533bb9ac3107ea91618))
+
 ## [1.2.0](https://github.com/CharlesRajendran/vsc-workspace-manager/compare/v1.1.0...v1.2.0) (2026-09-09)
 
 

@@ -73,13 +73,13 @@
 
     <!-- Navigation Mode Switcher -->
     <nav class="mode-tabs">
-      <button id="tab-runner-btn" class="tab-btn active">
+      <button id="tab-runner-btn" class="tab-btn">
         <svg class="tab-svg" viewBox="0 0 16 16" width="14" height="14">
           <path d="M6 1v3H1v11h14V4h-5V1H6zm1 1h2v2H7V2zm-5 3h12v9H2V5zm2 2v5l5-2.5L4 7z" fill="currentColor"/>
         </svg>
         <span>Run Saved Command</span>
       </button>
-      <button id="tab-builder-btn" class="tab-btn">
+      <button id="tab-builder-btn" class="tab-btn active">
         <svg class="tab-svg" viewBox="0 0 16 16" width="14" height="14">
           <path d="M14 7H9V2H7v5H2v2h5v5h2V9h5V7z" fill="currentColor"/>
         </svg>
@@ -88,7 +88,7 @@
     </nav>
 
     <!-- TAB 1: PRESET RUNNER -->
-    <main id="tab-runner" class="tab-content active">
+    <main id="tab-runner" class="tab-content">
       <!-- Searchable Combobox Section -->
       <section class="card runner-card">
         <div class="section-header">
@@ -279,7 +279,7 @@ $ ng serve</code></pre>
     </main>
 
     <!-- TAB 2: COMMAND BUILDER -->
-    <main id="tab-builder" class="tab-content">
+    <main id="tab-builder" class="tab-content active">
       <div class="builder-wrapper">
         <section class="card">
           <div class="section-header">

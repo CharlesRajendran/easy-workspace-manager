@@ -1,6 +1,6 @@
 {
   "name": "easy-workspace-manager",
-  "displayName": "Easy Workspace Manager",
+  "displayName": "Workspace Terminal Manager",
   "description": "Orchestrate, configure, and execute commands across multi-repository workspaces with dynamic prompts and per-project overrides.",
   "version": "1.2.0",
   "license": "MIT",
@@ -35,7 +35,7 @@
       "activitybar": [
         {
           "id": "workspace-manager-container",
-          "title": "Easy Workspace Manager",
+          "title": "Workspace Terminal Manager",
           "icon": "resources/activitybar-icon.svg"
         }
       ]
@@ -52,32 +52,32 @@
     "commands": [
       {
         "command": "workspaceManager.openDashboard",
-        "title": "Open Easy Workspace Manager Dashboard",
-        "category": "Easy Workspace Manager",
+        "title": "Open Workspace Terminal Manager Dashboard",
+        "category": "Workspace Terminal Manager",
         "icon": "$(layout-panel)"
       },
       {
         "command": "workspaceManager.newCommand",
         "title": "Create New Workspace Command",
-        "category": "Easy Workspace Manager",
+        "category": "Workspace Terminal Manager",
         "icon": "$(add)"
       },
       {
         "command": "workspaceManager.runPreset",
         "title": "Run Workspace Command Preset",
-        "category": "Easy Workspace Manager",
+        "category": "Workspace Terminal Manager",
         "icon": "$(play)"
       },
       {
         "command": "workspaceManager.refreshFolders",
         "title": "Refresh Workspace Projects",
-        "category": "Easy Workspace Manager",
+        "category": "Workspace Terminal Manager",
         "icon": "$(refresh)"
       },
       {
         "command": "workspaceManager.stopAllTerminals",
         "title": "Close All Managed Terminals",
-        "category": "Easy Workspace Manager",
+        "category": "Workspace Terminal Manager",
         "icon": "$(trash)"
       }
     ],
@@ -113,7 +113,7 @@
       ]
     },
     "configuration": {
-      "title": "Easy Workspace Manager",
+      "title": "Workspace Terminal Manager",
       "properties": {
         "workspaceManager.reuseTerminals": {
           "type": "boolean",
@@ -122,8 +122,8 @@
         },
         "workspaceManager.terminalPrefix": {
           "type": "string",
-          "default": "[EWM]",
-          "description": "Prefix used for managed terminal names (e.g. [EWM] frontend)."
+          "default": "[WTM]",
+          "description": "Prefix used for managed terminal names (e.g. [WTM] frontend)."
         },
         "workspaceManager.saveFileLocation": {
           "type": "string",

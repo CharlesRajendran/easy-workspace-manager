@@ -23,7 +23,7 @@ export class TerminalRunner {
 
     const config = vscode.workspace.getConfiguration('workspaceManager');
     const reuseTerminals = config.get<boolean>('reuseTerminals', true);
-    const prefix = config.get<string>('terminalPrefix', '[EWM]');
+    const prefix = config.get<string>('terminalPrefix', '[WTM]');
 
     for (let i = 0; i < targets.length; i += 1) {
       const target = targets[i];
@@ -62,7 +62,7 @@ export class TerminalRunner {
 
   public static openSingleTerminal(repoPath: string, repoName: string): void {
     const config = vscode.workspace.getConfiguration('workspaceManager');
-    const prefix = config.get<string>('terminalPrefix', '[EWM]');
+    const prefix = config.get<string>('terminalPrefix', '[WTM]');
     const terminalName = `${prefix} ${repoName}`;
 
     let terminal = vscode.window.terminals.find((t) => t.name === terminalName);
@@ -77,7 +77,7 @@ export class TerminalRunner {
 
   public static closeAllManagedTerminals(): void {
     const config = vscode.workspace.getConfiguration('workspaceManager');
-    const prefix = config.get<string>('terminalPrefix', '[EWM]');
+    const prefix = config.get<string>('terminalPrefix', '[WTM]');
 
     const managed = vscode.window.terminals.filter((t) => t.name.startsWith(prefix));
     managed.forEach((t) => t.dispose());

@@ -15,6 +15,6 @@
   ],
   "settings": {
     "workspaceManager.reuseTerminals": true,
-    "workspaceManager.terminalPrefix": "[EWM]"
+    "workspaceManager.terminalPrefix": "[WTM]"
   }
 }

@@ -1,10 +1,10 @@
-# Easy Workspace Manager for Visual Studio Code
+# Workspace Terminal Manager for Visual Studio Code
 
 [![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/charles-rajendran.easy-workspace-manager?label=Marketplace&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=charles-rajendran.easy-workspace-manager)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 <p align="center">
-  <img src="resources/icon.png" width="128" height="128" alt="Easy Workspace Manager Logo" />
+  <img src="resources/icon.png" width="128" height="128" alt="Workspace Terminal Manager Logo" />
 </p>
 
 <p align="center">
@@ -13,27 +13,31 @@
 
 ---
 
-## Why Easy Workspace Manager?
+## Why Workspace Terminal Manager?
 
 Managing multi-root workspaces or monorepos with dozens of microservices often means juggling multiple terminals, repeatedly typing git commands, and manually running build or dev scripts across each project folder.
 
-**Easy Workspace Manager** provides a central mission-control dashboard inside VS Code to:
+**Workspace Terminal Manager** provides a central mission-control dashboard inside VS Code to:
 * Run commands simultaneously (or sequentially) across all or selected workspace projects.
 * Fill in dynamic flags (like `-m "feat: my commit"`) with customized user prompts.
 * Apply per-repository command overrides (e.g. running `ng serve` for frontend while other services run `npm start`).
-* Automatically organize outputs into clean, dedicated project terminals (`[EWM] <project-name>`).
+* Automatically organize outputs into clean, dedicated project terminals (`[WTM] <project-name>`).
 
 ---
 
 ## Quick Usage
 
-Let's see **Easy Workspace Manager** in action:
+Let's see **Workspace Terminal Manager** in action:
+
+<p align="center">
+  <img src="resources/screenshots/dashboard-runner.png" alt="Workspace Terminal Manager - Preset Runner Dashboard" width="850" />
+</p>
 
 1. **Open your Workspace**: Open any multi-root workspace in VS Code (**File > Open Workspace from File...** or open a multi-folder workspace).
 2. **Open the Dashboard**:
-   - Click the **Easy Workspace Manager** icon in the **Activity Bar** (left sidebar), OR
-   - Click **`$(folder-library) Easy Workspace Manager`** in the **Status Bar** (bottom-left), OR
-   - Press `F1` (or `Cmd+Shift+P` / `Ctrl+Shift+P`), type `Easy Workspace Manager: Open Dashboard`, and press `Enter`.
+   - Click the **Workspace Terminal Manager** icon in the **Activity Bar** (left sidebar), OR
+   - Click **`$(folder-library) Workspace Terminal Manager`** in the **Status Bar** (bottom-left), OR
+   - Press `F1` (or `Cmd+Shift+P` / `Ctrl+Shift+P`), type `Workspace Terminal Manager: Open Dashboard`, and press `Enter`.
 3. **Choose a Command**: Use the searchable combobox to select a preset (e.g. `Dev: Start All Services`, `Git: Bulk Commit & Push`, `Build: Build All Projects`).
 4. **Enter Parameters & Select Projects**: If the command has dynamic options (such as `-m`), enter your parameter value and select which repositories should receive the command.
 5. **Run**: Click **Run Across Repositories**! Watch as dedicated terminals launch and execute your command cleanly in parallel.
@@ -44,21 +48,26 @@ Let's see **Easy Workspace Manager** in action:
 
 ### ⚡ Run Saved Command (Preset Runner)
 - **Searchable Combobox**: Live fuzzy typeahead filter over your saved command names and descriptions with full keyboard navigation (`↑`, `↓`, `Enter`, `Esc`).
-- **Dynamic User Prompts**: Only displays input fields for flags that need values (e.g. `Enter commit message...` for `-m`).
+- **Dynamic User Prompts**: Only displays input fields for flags that need values (e.g. `Enter commit message...` for `-m`, or standalone self-options like `--tags`).
 - **Target Repositories Checklist**: Multi-select project toggles with "Select All" and "Deselect All" quick buttons.
 - **Git Branch & Script Badges**: Automatically detects and displays the active Git branch (`main`, `develop`) and scripts detected from `package.json` for each project.
 - **Live Execution Preview**: macOS-style terminal preview showing the exact assembled command for every repository before dispatching.
 
 ### ➕ Create New Command (Command Builder)
+
+<p align="center">
+  <img src="resources/screenshots/dashboard-builder.png" alt="Workspace Terminal Manager - Command Builder & Workflow Configurator" width="850" />
+</p>
+
 - **Custom Workflow Definition**: Build reusable commands with user-friendly names, descriptions, and base shell commands.
-- **Dynamic Flags & Options**: Add customizable flags (e.g., `-m`, `--env`, `-b`) with custom placeholders, default values, and required validation.
+- **Dynamic Flags & Options**: Add customizable flags (e.g., `-m`, `--env`, `-b`, `--tags`) with custom placeholders, default values, required validation, or self-option toggles.
 - **Per-Repository Overrides**: Easily configure overrides for projects with unique requirements (e.g., run `pnpm dev` for one service and `cargo run` for another).
 - **Flexible Persistence**: Save commands directly to `.vscode/workspace-commands.json` (persisted and shareable with team members via Git) or store them in private extension state.
 
 ### 🖥️ Intelligent Terminal Orchestration
-- **Dedicated Project Terminals**: Creates clean terminals prefixed with `[EWM] <repo-name>` with working directories (`cwd`) set directly to the repository's path.
+- **Dedicated Project Terminals**: Creates clean terminals prefixed with `[WTM] <repo-name>` with working directories (`cwd`) set directly to the repository's path.
 - **Parallel or Sequential Modes**: Run commands across all repositories simultaneously, or stagger them sequentially for clean initialization.
-- **1-Click Terminal Cleanup**: Dedicated "Close Managed Terminals" action closes all active `[EWM]` terminals with a single click.
+- **1-Click Terminal Cleanup**: Dedicated "Close Managed Terminals" action closes all active `[WTM]` terminals with a single click.
 
 ---
 
@@ -70,18 +79,18 @@ Let's see **Easy Workspace Manager** in action:
 | **Create New Command** | `workspaceManager.newCommand` | Opens the dashboard directly to the Command Builder tab. |
 | **Run Preset** | `workspaceManager.runPreset` | Executes a saved preset directly from the Command Palette or Quick Presets sidebar. |
 | **Refresh Projects** | `workspaceManager.refreshFolders` | Scans workspace folders, Git branches, and `package.json` scripts. |
-| **Close All Terminals** | `workspaceManager.stopAllTerminals` | Closes all `[EWM]` terminals managed by this extension. |
+| **Close All Terminals** | `workspaceManager.stopAllTerminals` | Closes all `[WTM]` terminals managed by this extension. |
 
 ---
 
 ## Configuration & Settings
 
-You can customize Easy Workspace Manager through VS Code Settings (**Settings > Extensions > Easy Workspace Manager**):
+You can customize Workspace Terminal Manager through VS Code Settings (**Settings > Extensions > Workspace Terminal Manager**):
 
 | Setting | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `workspaceManager.reuseTerminals` | `boolean` | `true` | Reuse existing terminals for the same project instead of creating a new terminal every run. |
-| `workspaceManager.terminalPrefix` | `string` | `"[EWM]"` | Prefix used for managed terminal names (e.g. `[EWM] web-frontend`). |
+| `workspaceManager.terminalPrefix` | `string` | `"[WTM]"` | Prefix used for managed terminal names (e.g. `[WTM] web-frontend`). |
 | `workspaceManager.saveFileLocation` | `string` | `"workspaceFile"` | Where to persist command presets: `"workspaceFile"` (`.vscode/workspace-commands.json`) or `"globalState"` (VS Code internal storage). |
 
 ---

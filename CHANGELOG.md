@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Easy Workspace Manager will be documented in this file.
+All notable changes to Workspace Terminal Manager will be documented in this file.
 
 ## [1.2.0](https://github.com/CharlesRajendran/vsc-workspace-manager/compare/v1.1.0...v1.2.0) (2026-09-09)
 
